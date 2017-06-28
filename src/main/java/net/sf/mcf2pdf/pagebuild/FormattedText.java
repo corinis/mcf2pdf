@@ -59,6 +59,14 @@ public class FormattedText {
 	public float getFontSize() {
 		return fontSize;
 	}
+	
+	
+	private String toHex() {
+	      Integer r = textColor.getRed();
+	      Integer g = textColor.getGreen();
+	      Integer b = textColor.getBlue();
+	      return String.format("#%02x%02x%02x", r, g, b);
+	}
 
 	public Element toElement(Namespace xslFoNs, Element le, FormattedText last) {
 		Element cur = new Element("inline", xslFoNs);
@@ -83,6 +91,9 @@ public class FormattedText {
 			cur.setAttribute("font-family", "Arial");
 			change = true;
 		}
+		if(textColor != null && !textColor.equals(last.textColor)) {
+			cur.setAttribute("color", toHex());
+		}
 		if(!change && le != null) { 
 			le.setText(le.getText() + text);
 			return null;
@@ -91,6 +102,10 @@ public class FormattedText {
 		
 		cur.setText(text);
 		return cur;
+	}
+
+	public String getHexColor() {
+		return toHex();
 	}
 
 }

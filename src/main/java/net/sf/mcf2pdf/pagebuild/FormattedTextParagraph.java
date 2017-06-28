@@ -148,6 +148,7 @@ public class FormattedTextParagraph {
 		eg.setAttribute("font-size", texts.get(0).getFontSize() + "pt");
 		eg.setAttribute("space-after", texts.get(0).getFontSize() + "pt");
 		eg.setAttribute("line-height", (texts.get(0).getFontSize()+2) + "pt");
+		eg.setAttribute("color", texts.get(0).getHexColor());
 		eg.setAttribute("font-family", texts.get(0).getFontFamily());
 		switch(alignment) {
 		case CENTER:
