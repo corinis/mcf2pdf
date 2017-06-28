@@ -71,8 +71,6 @@ public class PageText implements PageDrawable {
 	private void parseText() {
 		// parse text out of content
 		String htmlText = text.getHtmlContent();
-		if(htmlText.contains("wun"))
-			System.out.println(htmlText);
 
 		paras = new Vector<FormattedTextParagraph>();
 
