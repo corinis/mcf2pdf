@@ -41,6 +41,8 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 
 	private float heightMM;
 
+	private boolean renderText;
+
 	private static final Comparator<PageDrawable> zComp = new Comparator<PageDrawable>() {
 		@Override
 		public int compare(PageDrawable p1, PageDrawable p2) {
@@ -49,11 +51,12 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 	};
 
 	public BitmapPageBuilder(float widthMM, float heightMM,
-			PageRenderContext context, File tempImageDir) throws IOException {
+			PageRenderContext context, File tempImageDir, boolean renderText) throws IOException {
 		this.widthMM = widthMM;
 		this.heightMM = heightMM;
 		this.context = context;
 		this.tempImageDir = tempImageDir;
+		this.renderText = renderText;
 	}
 
 	@Override
@@ -76,9 +79,11 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 			int top = context.toPixel(pd.getTopMM());
 
 			Point offset = new Point();
-			if(pd instanceof PageText) {
-				texts.add((PageText)pd);
-				continue;
+			if(!renderText) {
+				if(pd instanceof PageText) {
+					texts.add((PageText)pd);
+					continue;
+				}
 			}
 			
 			try {

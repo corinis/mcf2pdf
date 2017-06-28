@@ -148,7 +148,7 @@ public class Mcf2FoConverter {
 	 * @throws SAXException If any XML related problem occurs, e.g. the input file
 	 * has an invalid format.
 	 */
-	public void convert(File mcfFile, OutputStream xslFoOut, int dpi, boolean binding, int maxPageNo) throws IOException, SAXException {
+	public void convert(File mcfFile, OutputStream xslFoOut, int dpi, boolean binding, int maxPageNo, boolean renderText) throws IOException, SAXException {
 		// build MCF DOM
 		log.debug("Reading MCF file");
 		McfFotobook book = new FotobookBuilder().readFotobook(mcfFile);
@@ -205,7 +205,7 @@ public class Mcf2FoConverter {
 
 		if (leftCover != null) {
 			log.info("Rendering cover...");
-			currentPage = new BitmapPageBuilder(coverPageWidth, coverPageHeight, context, tempImageDir);
+			currentPage = new BitmapPageBuilder(coverPageWidth, coverPageHeight, context, tempImageDir, renderText);
 			processDoublePage(leftCover, rightCover, imageDir, false);
 			docBuilder.startFlow("cover");
 			currentPage.addToDocumentBuilder(docBuilder);
@@ -230,7 +230,7 @@ public class Mcf2FoConverter {
 		// now, process pages as a pair
 		docBuilder.startFlow("default");
 		log.debug("Starting rendering of " + normalPages.size() + " pages");
-		currentPage = new BitmapPageBuilder(pageWidth, pageHeight, context, tempImageDir);
+		currentPage = new BitmapPageBuilder(pageWidth, pageHeight, context, tempImageDir, renderText);
 
 		for (int i = 0; i < normalPages.size(); i += 2) {
 			log.info("Rendering pages " + i + "+" + (i+1) + "...");
@@ -240,7 +240,7 @@ public class Mcf2FoConverter {
 			currentPage.addToDocumentBuilder(docBuilder);
 			if (i < normalPages.size() - 2) {
 				docBuilder.newPage();
-				currentPage = new BitmapPageBuilder(pageWidth, pageHeight, context, tempImageDir);
+				currentPage = new BitmapPageBuilder(pageWidth, pageHeight, context, tempImageDir, renderText);
 			}
 		}
 
