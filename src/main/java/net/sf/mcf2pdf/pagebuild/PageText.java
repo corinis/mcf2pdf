@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
+import net.sf.mcf2pdf.mcfelements.McfArea;
 import net.sf.mcf2pdf.mcfelements.McfText;
 import net.sf.mcf2pdf.mcfelements.util.ImageUtil;
 import net.sf.mcf2pdf.pagebuild.FormattedTextParagraph.Alignment;
@@ -169,12 +170,18 @@ public class PageText implements PageDrawable {
 		// TODO Auto-generated method stub
 	}
 	
-	public float getWidth() {
-		return text.getArea().getWidth() / 10.0f;
+	public McfArea getArea() {
+		return text.getArea();
 	}
-
-	public float getHeight() {
-		return text.getArea().getHeight() / 10.0f;
+	
+	public float getRotation() {
+		float r = text.getArea().getRotation();
+		if(r == 0)
+			return 0;
+		r = r - 180;
+		if (r < 0)
+			r+=360;
+		return r;
 	}
 	
 	@Override

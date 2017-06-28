@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import net.sf.mcf2pdf.mcfelements.McfArea;
 import net.sf.mcf2pdf.mcfelements.util.XslFoDocumentBuilder;
 
 import org.apache.fop.area.inline.TextArea;
@@ -100,17 +101,39 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 		}
 	}
 
+	private String toHex(Color textColor) {
+	      Integer r = textColor.getRed();
+	      Integer g = textColor.getGreen();
+	      Integer b = textColor.getBlue();
+	      return String.format("#%02x%02x%02x", r, g, b);
+	}
+	
 	private Element createXslFoElement(PageText pd, Namespace xslFoNs) {
 		Element eg = new Element("block-container", xslFoNs);
+		McfArea area = pd.getArea();
+		float top = pd.getTopMM();
+		float left = pd.getLeftMM();
+		float width = area.getWidth() / 10f;
+		float height = area.getHeight() / 10f;
+		if(pd.getRotation() != 0) {
+			eg.setAttribute("reference-orientation", pd.getRotation()+"");
+		}
+
+		if(area.isBorderEnabled() && area.getBorderColor() != null) {
+			eg.setAttribute("border-style", "solid");
+			eg.setAttribute("border-color", toHex(area.getBorderColor()));
+		}
+
+		if(area.getBackgroundColor() != null) {
+			eg.setAttribute("background-color", toHex(area.getBackgroundColor()));
+		}
+
 		// now for the text
 		eg.setAttribute("absolute-position", "absolute");
-		eg.setAttribute("top", pd.getTopMM() + "mm");
-		eg.setAttribute("left", pd.getLeftMM() + "mm");
-		eg.setAttribute("width", pd.getWidth() + "mm");
-		eg.setAttribute("height", pd.getHeight() + "mm");
-		eg.setAttribute("content-width", pd.getWidth() + "mm");
-		eg.setAttribute("content-height", pd.getHeight() + "mm");
-		
+		eg.setAttribute("top", top + "mm");
+		eg.setAttribute("left", left + "mm");
+		eg.setAttribute("width", width + "mm");
+		eg.setAttribute("height", height + "mm");
 		// blocks 
 		for(Element block : pd.renderBlocks(xslFoNs))
 			eg.addContent(block);
