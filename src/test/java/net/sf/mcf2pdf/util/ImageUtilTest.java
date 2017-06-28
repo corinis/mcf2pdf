@@ -26,17 +26,4 @@ public class ImageUtilTest {
 		Assert.assertEquals(180.0f, res[1], 0.01f);
 	}
 
-	@Test
-	public void testRender() throws Exception {
-		
-		Main.main(new String[] {"-b", "-i", "/home/gargan/software/BIPA", "-r", "300", "-n", "7", "-t", "/home/gargan/.mcf",
-				"/home/gargan/FotobuchArgentinien/Argentinien 2013.mcf", "/home/gargan/1test.pdf"});
-	}
-
-	@Test
-	public void testFo() throws Exception {
-		
-		Main.main(new String[] {"-b", "-i", "/home/gargan/software/BIPA", "-x", "-r", "300", "-n", "3", "-t", "/home/gargan/.mcf",
-				"/home/gargan/FotobuchArgentinien/Argentinien 2013.mcf", "/home/gargan/1test.fo"});
-	}
 }
