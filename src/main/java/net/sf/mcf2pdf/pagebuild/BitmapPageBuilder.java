@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.imageio.ImageIO;
 
 import net.sf.mcf2pdf.mcfelements.util.XslFoDocumentBuilder;
 
+import org.apache.fop.area.inline.TextArea;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -67,12 +69,17 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 		Graphics2D g2d = img.createGraphics();
 		g2d.setColor(Color.white);
 		g2d.fillRect(0, 0, img.getWidth(), img.getHeight());
-
+		List<PageText> texts = new ArrayList<PageText>();
 		for (PageDrawable pd : pageContents) {
 			int left = context.toPixel(pd.getLeftMM());
 			int top = context.toPixel(pd.getTopMM());
 
 			Point offset = new Point();
+			if(pd instanceof PageText) {
+				texts.add((PageText)pd);
+				continue;
+			}
+			
 			try {
 				BufferedImage pdImg = pd.renderAsBitmap(context, offset);
 				if (pdImg != null)
@@ -82,10 +89,33 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 				// ignore
 				// throw e;
 			}
+			
 		}
 
 		docBuilder.addPageElement(createXslFoElement(img, docBuilder.getNamespace()), widthMM, heightMM);
 		g2d.dispose();
+		
+		for(PageText pd : texts) {
+			docBuilder.addPageElement(createXslFoElement(pd, docBuilder.getNamespace()), widthMM, heightMM);
+		}
+	}
+
+	private Element createXslFoElement(PageText pd, Namespace xslFoNs) {
+		Element eg = new Element("block-container", xslFoNs);
+		// now for the text
+		eg.setAttribute("absolute-position", "absolute");
+		eg.setAttribute("top", pd.getTopMM() + "mm");
+		eg.setAttribute("left", pd.getLeftMM() + "mm");
+		eg.setAttribute("width", pd.getWidth() + "mm");
+		eg.setAttribute("height", pd.getHeight() + "mm");
+		eg.setAttribute("content-width", pd.getWidth() + "mm");
+		eg.setAttribute("content-height", pd.getHeight() + "mm");
+		
+		// blocks 
+		for(Element block : pd.renderBlocks(xslFoNs))
+			eg.addContent(block);
+		
+		return eg;
 	}
 
 	private Element createXslFoElement(BufferedImage img, Namespace xslFoNs) throws IOException {

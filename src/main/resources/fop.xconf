@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+
+<fop version="1.0">
+  <base>.</base>
+  
+  <source-resolution>72</source-resolution>
+  <target-resolution>72</target-resolution>
+  
+  <default-page-settings height="11.00in" width="8.50in"/>
+  
+  <renderers>
+    <renderer mime="application/pdf">
+      <version>1.5</version>
+      <filterList>
+        <value>flate</value>
+  
+        <!-- encodes binary data into printable ascii characters (default off)
+             This provides about a 4:5 expansion of data size -->
+        <!-- <value>ascii-85</value> -->
+  
+        <!-- encodes binary data with hex representation (default off)
+             This filter is not recommended as it doubles the data size -->
+        <!-- <value>ascii-hex</value> -->
+      </filterList>
+
+      <fonts>
+         <auto-detect/>
+      </fonts>
+    </renderer>
+
+    <renderer mime="application/x-afp">
+      <!--
+           The bit depth and type of images produced
+           (this is the default setting)
+      -->
+      <images mode="b+w" bits-per-pixel="8"/>
+      <renderer-resolution>240</renderer-resolution>
+      <line-width-correction>2.5</line-width-correction>
+      <resource-group-file>resources.afp</resource-group-file>
+    </renderer>
+
+    <renderer mime="application/postscript">
+      <!-- This option forces the PS renderer to rotate landscape pages -->
+      <!--auto-rotate-landscape>true</auto-rotate-landscape-->
+      
+      <!-- This option lets you specify additional options on an XML handler -->
+      <!--xml-handler namespace="http://www.w3.org/2000/svg">
+        <stroke-text>false</stroke-text>
+      </xml-handler-->
+    </renderer>
+
+    <renderer mime="application/vnd.hp-PCL">
+    </renderer>
+
+    <!-- MIF does not have a renderer
+    <renderer mime="application/vnd.mif">
+    </renderer>
+    -->
+
+    <renderer mime="image/svg+xml">
+      <format type="paginated"/>
+      <link value="true"/>
+      <strokeText value="false"/>
+    </renderer>
+
+    <renderer mime="application/awt">
+    </renderer>
+
+    <renderer mime="image/png">
+      <!--transparent-page-background>true</transparent-page-background-->
+    </renderer>
+
+    <renderer mime="image/tiff">
+      <!--transparent-page-background>true</transparent-page-background-->
+      <!--compression>CCITT T.6</compression-->
+    </renderer>
+
+    <renderer mime="text/xml">
+    </renderer>
+
+    <!-- RTF does not have a renderer
+    <renderer mime="text/rtf">
+    </renderer>
+    -->
+
+  </renderers>
+
+</fop>

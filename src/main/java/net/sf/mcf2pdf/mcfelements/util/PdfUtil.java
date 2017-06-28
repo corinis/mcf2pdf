@@ -8,6 +8,7 @@
 package net.sf.mcf2pdf.mcfelements.util;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,15 +21,20 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopConfParser;
 import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.apps.PageSequenceResults;
+import org.apache.fop.apps.io.ResourceResolverFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Utility class for working with PDFs.
@@ -50,8 +56,14 @@ public class PdfUtil {
 	@SuppressWarnings("rawtypes")
 	public static void convertFO2PDF(InputStream fo, OutputStream pdf, int dpi) throws IOException,
 			FOPException, TransformerException {
-
-		FopFactory fopFactory = FopFactory.newInstance();
+		
+		FopConfParser parser;
+		try {
+			parser = new FopConfParser(fo.getClass().getResourceAsStream("/fop.xconf"), new File(".").toURI());
+		} catch (SAXException e) {
+			throw new IOException("unable to read fop.xconf", e);
+		}
+		FopFactory fopFactory = parser.getFopFactoryBuilder().build();
 
 		FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 		// configure foUserAgent as desired

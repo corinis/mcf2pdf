@@ -14,10 +14,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.AttributedCharacterIterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 import net.sf.mcf2pdf.mcfelements.McfText;
 import net.sf.mcf2pdf.mcfelements.util.ImageUtil;
@@ -36,7 +40,7 @@ public class PageText implements PageDrawable {
 	private static final Pattern PATTERN_HTML_TEXT_SPAN = Pattern.compile("<span\\s+style=\"([^\"]+)\"[^>]*>((.(?!</span>))*.)</span>");
 	private static final Pattern PATTERN_BODY_STYLE = Pattern.compile("<body\\s([^>]*)style=\"([^\"]+)\">");
 	private static final Pattern PATTERN_TABLE_STYLE = Pattern.compile("<table\\s([^>]*)style=\"([^\"]+)\">");
-	private static final Pattern PATTERN_HTML_TEXT = Pattern.compile("([^<]\\w+[^/> ])");
+	private static final Pattern PATTERN_HTML_TEXT = Pattern.compile("([^<].+[^/> ])");
 
 	private static final String BR_TAG = "<br />";
 
@@ -67,6 +71,8 @@ public class PageText implements PageDrawable {
 	private void parseText() {
 		// parse text out of content
 		String htmlText = text.getHtmlContent();
+		if(htmlText.contains("wun"))
+			System.out.println(htmlText);
 
 		paras = new Vector<FormattedTextParagraph>();
 
@@ -129,20 +135,25 @@ public class PageText implements PageDrawable {
 
 			//Some paragraphs have no <span> tags
 			if (curSpanStart == 0){
-				Matcher mt = PATTERN_HTML_TEXT.matcher(paraContent);
-				int curTextStart = 0;
-				while (mt.find(curTextStart)){
-					String paraText = mt.group();
-					while (paraText.contains(BR_TAG)) {
-						String text = paraText.substring(0, paraText.indexOf(BR_TAG));
-						para.addText(createFormattedText(text, ""));
-						paras.add(para);
-						para = para.createEmptyCopy();
-						paraText = paraText.substring(paraText.indexOf(BR_TAG) + BR_TAG.length());
+				if(paraContent.indexOf('<') == -1) {
+					para.addText(createFormattedText(paraContent, ""));
+				}
+				else {
+					Matcher mt = PATTERN_HTML_TEXT.matcher(paraContent);
+					int curTextStart = 0;
+					while (mt.find(curTextStart)){
+						String paraText = mt.group();
+						while (paraText.contains(BR_TAG)) {
+							String text = paraText.substring(0, paraText.indexOf(BR_TAG));
+							para.addText(createFormattedText(text, ""));
+							paras.add(para);
+							para = para.createEmptyCopy();
+							paraText = paraText.substring(paraText.indexOf(BR_TAG) + BR_TAG.length());
+						}
+						
+						para.addText(createFormattedText(paraText, ""));
+						curTextStart = mt.end();
 					}
-					
-					para.addText(createFormattedText(paraText, ""));
-					curTextStart = mt.end();
 				}
 			}
 			
@@ -159,7 +170,15 @@ public class PageText implements PageDrawable {
 	public void renderAsSvgElement(Writer writer, PageRenderContext context) throws IOException {
 		// TODO Auto-generated method stub
 	}
+	
+	public float getWidth() {
+		return text.getArea().getWidth() / 10.0f;
+	}
 
+	public float getHeight() {
+		return text.getArea().getHeight() / 10.0f;
+	}
+	
 	@Override
 	public BufferedImage renderAsBitmap(PageRenderContext context,
 			Point drawOffsetPixels) throws IOException {
@@ -387,6 +406,14 @@ public class PageText implements PageDrawable {
 
 	private boolean isValidMargin(String s, String a, String v) {
 		return s.equalsIgnoreCase(a) && v.matches("[0-9]+px");
+	}
+
+	public List<Element> renderBlocks(Namespace xslFoNs) {
+		List<Element> result = new ArrayList<Element>();
+		for(FormattedTextParagraph p : paras) {
+			result.add(p.toElement(xslFoNs));
+		}
+		return result;
 	}
 
 }

@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.jdom.Element;
+import org.jdom.Namespace;
+
 public class FormattedTextParagraph {
 	
 	public static enum Alignment {
@@ -138,6 +141,41 @@ public class FormattedTextParagraph {
 		}
 		
 		return font;
+	}
+
+	public Element toElement(Namespace xslFoNs) {
+		Element eg = new Element("block", xslFoNs);
+		eg.setAttribute("font-size", texts.get(0).getFontSize() + "pt");
+		eg.setAttribute("space-after", texts.get(0).getFontSize() + "pt");
+		eg.setAttribute("line-height", (texts.get(0).getFontSize()+2) + "pt");
+		eg.setAttribute("font-family", texts.get(0).getFontFamily());
+		switch(alignment) {
+		case CENTER:
+			eg.setAttribute("text-align", "center");
+			break;
+		case LEFT:
+			eg.setAttribute("text-align", "left");
+			break;
+		case RIGHT:
+			eg.setAttribute("text-align", "right");
+			break;
+		case JUSTIFY:
+			eg.setAttribute("text-align", "justify");
+			break;
+		}
+		
+		Element le = null;
+		FormattedText last = texts.get(0);
+		for(FormattedText ft : texts) {
+			Element cur = ft.toElement(xslFoNs, le, last);
+			if(cur != null) {
+				eg.addContent(cur);
+				le = cur;
+				last = ft;
+			}
+		}
+		
+		return eg;
 	}
 
 
