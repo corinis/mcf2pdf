@@ -85,7 +85,7 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 					continue;
 				}
 			}
-			
+
 			try {
 				BufferedImage pdImg = pd.renderAsBitmap(context, offset);
 				if (pdImg != null)
@@ -95,12 +95,12 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 				// ignore
 				// throw e;
 			}
-			
+
 		}
 
 		docBuilder.addPageElement(createXslFoElement(img, docBuilder.getNamespace()), widthMM, heightMM);
 		g2d.dispose();
-		
+
 		for(PageText pd : texts) {
 			docBuilder.addPageElement(createXslFoElement(pd, docBuilder.getNamespace()), widthMM, heightMM);
 		}
@@ -112,7 +112,7 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 	      Integer b = textColor.getBlue();
 	      return String.format("#%02x%02x%02x", r, g, b);
 	}
-	
+
 	private Element createXslFoElement(PageText pd, Namespace xslFoNs) {
 		Element eg = new Element("block-container", xslFoNs);
 		McfArea area = pd.getArea();
@@ -139,10 +139,10 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 		eg.setAttribute("left", left + "mm");
 		eg.setAttribute("width", width + "mm");
 		eg.setAttribute("height", height + "mm");
-		// blocks 
+		// blocks
 		for(Element block : pd.renderBlocks(xslFoNs))
 			eg.addContent(block);
-		
+
 		return eg;
 	}
 
@@ -163,12 +163,16 @@ public class BitmapPageBuilder extends AbstractPageBuilder {
 		ImageIO.write(imgPlain, "jpeg", f);
 
 		Element eg = new Element("external-graphic", xslFoNs);
-		eg.setAttribute("src", f.getAbsolutePath());
+		eg.setAttribute("src", extractPath(f));
 		eg.setAttribute("content-width", widthMM + "mm");
 		eg.setAttribute("content-height", heightMM + "mm");
 		f.deleteOnExit();
 
 		return eg;
+	}
+
+	private String extractPath(File f) {
+		return String.format("file:///%s",f.getAbsolutePath().replace("\\","/"));
 	}
 
 
